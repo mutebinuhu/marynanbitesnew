@@ -115,6 +115,107 @@ const menuItems = [
     }
   },
   {
+    id: 32,
+    name: "Katogo (Breakfast)",
+    description: "Traditional Ugandan breakfast of matooke cooked with offal or beef in a rich sauce.",
+    price: 15000,
+    category: "Breakfast",
+    image: "/api/placeholder/300/200?text=Katogo",
+    rating: 4.7,
+    popular: true,
+    customizable: false
+  },
+  {
+    id: 33,
+    name: "Rolex (Breakfast)",
+    description: "Ugandan street food classic - chapati rolled with eggs and vegetables.",
+    price: 8000,
+    category: "Breakfast",
+    image: "/api/placeholder/300/200?text=Rolex",
+    rating: 4.8,
+    customizable: false
+  },
+  {
+    id: 34,
+    name: "Mandazi & Tea",
+    description: "Fluffy East African doughnuts served with spiced tea.",
+    price: 7000,
+    category: "Breakfast",
+    image: "/api/placeholder/300/200?text=Mandazi+Tea",
+    rating: 4.5,
+    customizable: false
+  },
+  {
+    id: 35,
+    name: "Full English Breakfast",
+    description: "Eggs, sausage, bacon, baked beans, toast, and tomatoes.",
+    price: 25000,
+    category: "Breakfast",
+    image: "/api/placeholder/300/200?text=English+Breakfast",
+    rating: 4.6,
+    customizable: false
+  },
+  {
+    id: 36,
+    name: "Pancakes with Honey",
+    description: "Fluffy pancakes drizzled with local honey.",
+    price: 12000,
+    category: "Breakfast",
+    image: "/api/placeholder/300/200?text=Pancakes",
+    rating: 4.4,
+    customizable: false
+  },
+  {
+    id: 37,
+    name: "Omelette with Toast",
+    description: "Three-egg omelette with your choice of fillings, served with toast.",
+    price: 15000,
+    category: "Breakfast",
+    image: "/api/placeholder/300/200?text=Omelette",
+    rating: 4.5,
+    customizable: true,
+    options: {
+      fillings: [
+        { name: "Cheese", price: 0 },
+        { name: "Tomatoes", price: 0 },
+        { name: "Onions", price: 0 },
+        { name: "Green Peppers", price: 0 },
+        { name: "Mushrooms", price: 2000 },
+        { name: "Bacon", price: 3000 }
+      ]
+    }
+  },
+  {
+    id: 38,
+    name: "Fruit Platter with Yogurt",
+    description: "Seasonal fresh fruits with homemade yogurt.",
+    price: 18000,
+    category: "Breakfast",
+    image: "/api/placeholder/300/200?text=Fruit+Platter",
+    rating: 4.3,
+    customizable: false
+  },
+  {
+    id: 39,
+    name: "Porridge with Groundnuts",
+    description: "Traditional millet porridge topped with roasted groundnuts.",
+    price: 8000,
+    category: "Breakfast",
+    image: "/api/placeholder/300/200?text=Porridge",
+    rating: 4.2,
+    customizable: false
+  },
+  {
+    id: 40,
+    name: "Breakfast Wrap",
+    description: "Scrambled eggs, sausage, and cheese in a soft tortilla.",
+    price: 15000,
+    category: "Breakfast",
+    image: "/api/placeholder/300/200?text=Breakfast+Wrap",
+    rating: 4.5,
+    customizable: false
+  },
+  {
     id: 2,
     name: "Rolex",
     description: "A popular Ugandan street food; chapati rolled with an omelette and vegetables.",
@@ -397,11 +498,11 @@ const menuItems = [
       ]
     }
   },
+  
 ];
 
 
-  const categories = useMemo(() => ['All', ...new Set(menuItems.map(item => item.category))], [menuItems]);
-
+const categories = useMemo(() => ['All', ...new Set(menuItems.map(item => item.category))], [menuItems]);
   const filteredItems = useMemo(() => {
     if (selectedCategory === 'All') {
       return menuItems;
