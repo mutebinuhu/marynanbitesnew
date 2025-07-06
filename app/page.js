@@ -607,10 +607,10 @@ export default function Home() {
                 <Phone className="h-12 w-12 text-orange-600 mx-auto mb-4" />
                 <h3 className="text-xl font-bold text-gray-900 mb-2">Contact Us & Make Reservations</h3>
                 <p className="text-gray-600">
-                  Phone: <a href="tel:+256758567701" className="text-orange-600 hover:underline">(+256) 758-567701</a><br />
+                  Phone: <a href="tel:+256758567701" className="text-orange-600 hover:underline">(+256) 706-908018</a><br />
                   Email: <a href="mailto:marynanbites@gmail.com" className="text-orange-600 hover:underline">marynanbites@gmail.com</a>
                   <br />
-                  Reservations: <a href="tel:+256758567701" className="text-orange-600 hover:underline">(+256) 758-567701</a>
+                  Reservations: <a href="tel:+256758567701" className="text-orange-600 hover:underline">(+256)  706-908018</a>
                 </p>
               </div>
             </div>
