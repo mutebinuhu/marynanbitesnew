@@ -1,584 +1,344 @@
-"use client"
-import { useState, useEffect } from 'react';
+"use client"; // This line is crucial for Next.js 13+ components that use client-side features like useState and event handlers.
+
 import Head from 'next/head';
-import Image from 'next/image';
-import { ShoppingCart, Star, Clock, MapPin, Phone, Mail, Plus, Minus, X, Menu } from 'lucide-react';
+import { useState, useEffect, useMemo } from 'react'; // Import useMemo for performance optimization
+import { ShoppingCart, Menu, X, Star, Plus, Minus, MapPin, Clock, Phone } from 'lucide-react'; // Assuming you're using Lucide Icons
 
-// Mock menu data - Customized for Ugandan dishes, Pizza, Chicken, Chips, Snacks, Juices, Lusaniya
-const menuItems = [
-  {
-    id: 1,
-    name: "Luwombo (Chicken/Beef)",
-    description: "Steamed chicken or beef in groundnut sauce, a traditional Ugandan delicacy, served with matooke.",
-    price: 35000, // Fixed price, not customizable like others
-    category: "Local Dishes",
-    image: "/api/placeholder/300/200?text=Luwombo",
-    rating: 4.9,
-    popular: true,
-    customizable: false // Luwombo is NOT customizable
-  },
-  // New customizable "Soup/Sauce" items
-  {
-    id: 15,
-    name: "Groundnut Soup Base",
-    description: "Rich and savory groundnut soup, customize with your choice of staple foods.",
-    price: 15000, // Base price for the soup/sauce
-    category: "Local Dishes",
-    image: "/api/placeholder/300/200?text=Groundnut Soup",
-    customizable: true,
-    type: "Soup/Sauce",
-    options: {
-      foods: [
-        { name: "Matooke", price: 0 },
-        { name: "Rice", price: 0 },
-        { name: "Posho", price: 0 },
-        { name: "Sweet Potatoes", price: 0 },
-        { name: "Cassava", price: 0 },
-        { name: "Irish Potatoes", price: 0 },
-        { name: "Chapati", price: 3000 }
-      ]
-    }
-  },
-  {
-    id: 16,
-    name: "Beans Soup Base",
-    description: "Hearty bean soup, perfect with your choice of staple foods.",
-    price: 12000,
-    category: "Local Dishes",
-    image: "/api/placeholder/300/200?text=Beans Soup",
-    customizable: true,
-    type: "Soup/Sauce",
-    options: {
-      foods: [
-        { name: "Matooke", price: 0 },
-        { name: "Rice", price: 0 },
-        { name: "Posho", price: 0 },
-        { name: "Sweet Potatoes", price: 0 },
-        { name: "Cassava", price: 0 },
-        { name: "Irish Potatoes", price: 0 },
-        { name: "Chapati", price: 3000 }
-      ]
-    }
-  },
-  {
-    id: 17,
-    name: "Chicken Soup Base",
-    description: "Delicious chicken soup, customize with your preferred staple foods.",
-    price: 20000,
-    category: "Local Dishes",
-    image: "/api/placeholder/300/200?text=Chicken Soup",
-    customizable: true,
-    type: "Soup/Sauce",
-    options: {
-      foods: [
-        { name: "Matooke", price: 0 },
-        { name: "Rice", price: 0 },
-        { name: "Posho", price: 0 },
-        { name: "Sweet Potatoes", price: 0 },
-        { name: "Cassava", price: 0 },
-        { name: "Irish Potatoes", price: 0 },
-        { name: "Chapati", price: 3000 }
-      ]
-    }
-  },
-  {
-    id: 18,
-    name: "Gnuts with Fish Soup Base",
-    description: "Groundnut soup with fish, pair it with your favorite staple foods.",
-    price: 25000,
-    category: "Local Dishes",
-    image: "/api/placeholder/300/200?text=Gnuts + Fish",
-    customizable: true,
-    type: "Soup/Sauce",
-    options: {
-      foods: [
-        { name: "Matooke", price: 0 },
-        { name: "Rice", price: 0 },
-        { name: "Posho", price: 0 },
-        { name: "Sweet Potatoes", price: 0 },
-        { name: "Cassava", price: 0 },
-        { name: "Irish Potatoes", price: 0 },
-        { name: "Chapati", price: 3000 }
-      ]
-    }
-  },
-  {
-    id: 2,
-    name: "Rolex",
-    description: "A popular Ugandan street food; chapati rolled with an omelette and vegetables.",
-    price: 8000,
-    category: "Local Dishes",
-    image: "/api/placeholder/300/200?text=Rolex",
-    rating: 4.7,
-    customizable: false // Rolex is NOT customizable in this way
-  },
-  {
-    id: 4,
-    name: "Katogo",
-    description: "A hearty breakfast dish: matooke cooked with offals or beef, often with groundnut sauce.",
-    price: 20000,
-    category: "Local Dishes",
-    image: "/api/placeholder/300/200?text=Katogo",
-    rating: 4.6,
-    popular: true,
-    customizable: false // Katogo is NOT customizable
-  },
-  {
-    id: 5,
-    name: "Whole Tilapia Fish",
-    description: "Grilled or fried whole tilapia fish, served with a side of kachumbari (fresh salad).",
-    price: 45000,
-    category: "Local Dishes",
-    image: "/api/placeholder/300/200?text=Tilapia",
-    rating: 4.8,
-    customizable: false // Tilapia is NOT customizable
-  },
-  {
-    id: 6,
-    name: "Margherita Pizza",
-    description: "Classic pizza with fresh mozzarella, tomato sauce and basil.",
-    price: 0, // Base price will be determined by size
-    category: "Pizza",
-    image: "/api/placeholder/300/200?text=Margherita Pizza",
-    rating: 4.6,
-    customizable: true,
-    type: "Pizza",
-    options: {
-      sizes: [
-        { name: "Small", price: 30000 },
-        { name: "Medium", price: 45000 },
-        { name: "Large", price: 60000 }
-      ]
-    }
-  },
-  {
-    id: 7,
-    name: "Chicken Tikka Pizza",
-    description: "Tandoori chicken pieces, onions, bell peppers, and mozzarella cheese on a crispy crust.",
-    price: 0, // Base price will be determined by size
-    category: "Pizza",
-    image: "/api/placeholder/300/200?text=Chicken Tikka Pizza",
-    rating: 4.7,
-    customizable: true,
-    type: "Pizza",
-    options: {
-      sizes: [
-        { name: "Small", price: 40000 },
-        { name: "Medium", price: 55000 },
-        { name: "Large", price: 70000 }
-      ]
-    }
-  },
-  {
-    id: 8,
-    name: "Beef Sausage Pizza",
-    description: "Savory beef sausage, mushrooms, olives, and mozzarella cheese.",
-    price: 0, // Base price will be determined by size
-    category: "Pizza",
-    image: "/api/placeholder/300/200?text=Beef Sausage Pizza",
-    rating: 4.5,
-    customizable: true,
-    type: "Pizza",
-    options: {
-      sizes: [
-        { name: "Small", price: 38000 },
-        { name: "Medium", price: 52000 },
-        { name: "Large", price: 67000 }
-      ]
-    }
-  },
-  {
-    id: 9,
-    name: "Full Roasted Chicken",
-    description: "Slow-roasted whole chicken, tender and juicy, seasoned to perfection.",
-    price: 60000,
-    category: "Chicken",
-    image: "/api/placeholder/300/200?text=Roasted Chicken",
-    rating: 4.8,
-    popular: true
-  },
-  {
-    id: 10,
-    name: "Half Fried Chicken",
-    description: "Crispy fried half chicken, golden brown and packed with flavor.",
-    price: 35000,
-    category: "Chicken",
-    image: "/api/placeholder/300/200?text=Fried Chicken",
-    rating: 4.7
-  },
-  {
-    id: 11,
-    name: "Chicken Wings (6 pcs)",
-    description: "Six succulent chicken wings, choice of BBQ, spicy, or plain.",
-    price: 25000,
-    category: "Chicken",
-    image: "/api/placeholder/300/200?text=Chicken Wings",
-    rating: 4.6
-  },
-  {
-    id: 12,
-    name: "Regular Chips (Fries)",
-    description: "Perfectly golden and crispy french fries, lightly salted.",
-    price: 10000,
-    category: "Chips",
-    image: "/api/placeholder/300/200?text=Chips",
-    rating: 4.4
-  },
-  {
-    id: 13,
-    name: "Chips with Chicken (Small)",
-    description: "A small portion of crispy chips served with tender pieces of fried chicken.",
-    price: 20000,
-    category: "Chips",
-    image: "/api/placeholder/300/200?text=Chips + Chicken",
-    rating: 4.6
-  },
-  {
-    id: 14,
-    name: "Chips with Beef",
-    description: "Crispy chips served with savory stir-fried beef strips.",
-    price: 25000,
-    category: "Chips",
-    image: "/api/placeholder/300/200?text=Chips + Beef",
-    rating: 4.5
-  },
-  // New Snacks Category
-  {
-    id: 19,
-    name: "Samosa (Beef)",
-    description: "Crispy pastry filled with spiced minced beef.",
-    price: 3000,
-    category: "Snacks",
-    image: "/api/placeholder/300/200?text=Samosa Beef",
-    rating: 4.5,
-    customizable: false
-  },
-  {
-    id: 20,
-    name: "Samosa (Vegetable)",
-    description: "Crispy pastry filled with spiced mixed vegetables.",
-    price: 2500,
-    category: "Snacks",
-    image: "/api/placeholder/300/200?text=Samosa Veg",
-    rating: 4.3,
-    customizable: false
-  },
-  {
-    id: 21,
-    name: "Meat Kebab",
-    description: "Grilled minced meat on a skewer, seasoned with herbs.",
-    price: 5000,
-    category: "Snacks",
-    image: "/api/placeholder/300/200?text=Meat Kebab",
-    rating: 4.6,
-    customizable: false
-  },
-  {
-    id: 22,
-    name: "Chicken Kebab",
-    description: "Grilled marinated chicken pieces on a skewer.",
-    price: 6000,
-    category: "Snacks",
-    image: "/api/placeholder/300/200?text=Chicken Kebab",
-    rating: 4.7,
-    customizable: false
-  },
-  {
-    id: 23,
-    name: "Chapati",
-    description: "Soft, flaky flatbread, perfect as a side or snack.",
-    price: 2000,
-    category: "Snacks",
-    image: "/api/placeholder/300/200?text=Chapati",
-    rating: 4.2,
-    customizable: false
-  },
-  {
-    id: 24,
-    name: "Crunchies",
-    description: "Crispy fried dough sticks, a popular Ugandan snack.",
-    price: 3000,
-    category: "Snacks",
-    image: "/api/placeholder/300/200?text=Crunchies",
-    rating: 4.4,
-    customizable: false
-  },
-  {
-    id: 25,
-    name: "Mandazi",
-    description: "Sweet, fluffy East African doughnuts.",
-    price: 1500,
-    category: "Snacks",
-    image: "/api/placeholder/300/200?text=Mandazi",
-    rating: 4.1,
-    customizable: false
-  },
-  {
-    id: 26,
-    name: "Half Cakes",
-    description: "Small, sweet, and soft baked cakes.",
-    price: 1000,
-    category: "Snacks",
-    image: "/api/placeholder/300/200?text=Half Cakes",
-    rating: 4.0,
-    customizable: false
-  },
-  // New Juices Category
-  {
-    id: 27,
-    name: "Fresh Mango Juice",
-    description: "Refreshing juice made from ripe, sweet mangoes.",
-    price: 8000,
-    category: "Juices",
-    image: "/api/placeholder/300/200?text=Mango Juice",
-    rating: 4.8,
-    customizable: false
-  },
-  {
-    id: 28,
-    name: "Fresh Passion Fruit Juice",
-    description: "Tangy and sweet juice from fresh passion fruits.",
-    price: 7000,
-    category: "Juices",
-    image: "/api/placeholder/300/200?text=Passion Juice",
-    rating: 4.7,
-    customizable: false
-  },
-  {
-    id: 29,
-    name: "Fresh Watermelon Juice",
-    description: "Hydrating and sweet juice from fresh watermelon.",
-    price: 6000,
-    category: "Juices",
-    image: "/api/placeholder/300/200?text=Watermelon Juice",
-    rating: 4.6,
-    customizable: false
-  },
-  {
-    id: 30,
-    name: "Mixed Fruit Juice",
-    description: "A delightful blend of seasonal fresh fruits.",
-    price: 9000,
-    category: "Juices",
-    image: "/api/placeholder/300/200?text=Mixed Juice",
-    rating: 4.9,
-    customizable: false
-  },
-  // New Lusaniya Category
-  {
-    id: 31,
-    name: "Lusaniya Platter",
-    description: "A traditional Ugandan sharing platter with assorted meats, staples, and sauces.",
-    price: 0, // Price determined by size
-    category: "Lusaniya",
-    image: "/api/placeholder/300/200?text=Lusaniya",
-    rating: 4.9,
-    popular: true,
-    customizable: true,
-    type: "Lusaniya",
-    options: {
-      sizes: [
-        { name: "Small", price: 70000, serves_people: "2-3 people" },
-        { name: "Medium", price: 120000, serves_people: "4-5 people" },
-        { name: "Large", price: 180000, serves_people: "6-8 people" },
-        { name: "Extra Large", price: 250000, serves_people: "9-12 people" }
-      ]
-    }
-  },
-];
-
-export default function RestaurantLandingPage() {
-  const [cart, setCart] = useState([]);
-  const [isCartOpen, setIsCartOpen] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState('All');
-  const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
+export default function Home() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  // State for customization modal
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [cart, setCart] = useState([]);
+  const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState('All');
   const [isCustomizationOpen, setIsCustomizationOpen] = useState(false);
   const [currentCustomizingItem, setCurrentCustomizingItem] = useState(null);
+  const [selectedFoods, setSelectedFoods] = useState([]); // For Soup/Sauce customization
+  const [selectedSize, setSelectedSize] = useState(null); // For Pizza/Lusaniya customization
 
-  // States specific to local dish customization (Soup/Sauce)
-  const [selectedFoods, setSelectedFoods] = useState([]);
-
-  // States specific to pizza and lusaniya customization
-  const [selectedSize, setSelectedSize] = useState(null);
-
-  const [currentCustomPrice, setCurrentCustomPrice] = useState(0);
-
-  const categories = ['All', 'Local Dishes', 'Pizza', 'Chicken', 'Chips', 'Snacks', 'Juices', 'Lusaniya']; // Updated categories
-
-  // Function to calculate custom dish price based on item type
-  const calculateCustomPrice = (item, selectedSize, selectedFoods) => {
-    let price = 0;
-
-    if (!item) return 0;
-
-    if (item.type === "Soup/Sauce") {
-      price = item.price; // Base price is soup/sauce price
-      selectedFoods.forEach(food => {
-        price += food.price;
-      });
-    } else if (item.type === "Pizza" || item.type === "Lusaniya") { // Added Lusaniya
-      if (selectedSize) {
-        price = selectedSize.price; // Base price is determined by selected size
+  // Define your menu items and categories
+  const menuItems = useMemo(() => [
+    {
+      id: 1,
+      name: 'Katogo (Matooke)',
+      description: 'A hearty Ugandan breakfast featuring mashed matooke (green bananas) cooked with offals, groundnuts, beans or beef.',
+      price: 15000,
+      image: '/menu/katogo.jpeg',
+      category: 'Ugandan Dishes',
+      popular: true,
+      rating: 4.8,
+      customizable: false,
+      type: 'Ugandan Dish'
+    },
+    {
+      id: 2,
+      name: 'Luwombo (Groundnut Sauce)',
+      description: 'Steamed groundnut sauce, traditionally cooked in banana leaves, served with your choice of food items.',
+      price: 25000,
+      image: '/menu/luwombo_groundnut.jpeg',
+      category: 'Ugandan Dishes',
+      popular: false,
+      rating: 4.5,
+      customizable: true,
+      type: 'Soup/Sauce',
+      options: {
+        foods: [
+          { name: 'Matooke', price: 0 },
+          { name: 'Rice', price: 0 },
+          { name: 'Posho', price: 0 },
+          { name: 'Cassava', price: 0 },
+          { name: 'Sweet Potatoes', price: 0 },
+          { name: 'Irish Potatoes', price: 0 },
+          { name: 'Pumpkin', price: 0 },
+          { name: 'Greens', price: 0 },
+          { name: 'Avocado', price: 0 },
+          { name: 'Chapati', price: 1000 },
+          { name: 'Rolex', price: 3000 }
+        ]
       }
-    } else {
-      price = item.price; // Fallback for any non-customized item
-    }
-    return price;
-  };
+    },
+    {
+      id: 3,
+      name: 'Luwombo (Beef)',
+      description: 'Tender beef stew, slow-cooked in banana leaves for maximum flavor, served with your choice of food items.',
+      price: 30000,
+      image: '/menu/luwombo_beef.jpeg',
+      category: 'Ugandan Dishes',
+      popular: true,
+      rating: 4.7,
+      customizable: true,
+      type: 'Soup/Sauce',
+      options: {
+        foods: [
+          { name: 'Matooke', price: 0 },
+          { name: 'Rice', price: 0 },
+          { name: 'Posho', price: 0 },
+          { name: 'Cassava', price: 0 },
+          { name: 'Sweet Potatoes', price: 0 },
+          { name: 'Irish Potatoes', price: 0 },
+          { name: 'Pumpkin', price: 0 },
+          { name: 'Greens', price: 0 },
+          { name: 'Avocado', price: 0 },
+          { name: 'Chapati', price: 1000 },
+          { name: 'Rolex', price: 3000 }
+        ]
+      }
+    },
+    {
+      id: 4,
+      name: 'Whole Tilapia',
+      description: 'Crispy fried whole tilapia, seasoned to perfection and served with a side of your choice.',
+      price: 35000,
+      image: '/menu/whole_tilapia.jpeg',
+      category: 'Ugandan Dishes',
+      popular: false,
+      rating: 4.6,
+      customizable: false,
+      type: 'Ugandan Dish'
+    },
+    {
+      id: 5,
+      name: 'Ugandan Rolex',
+      description: 'A popular Ugandan street food: chapati rolled with an omelette and fresh vegetables.',
+      price: 5000,
+      image: '/menu/rolex.jpeg',
+      category: 'Snacks',
+      popular: true,
+      rating: 4.9,
+      customizable: false,
+      type: 'Snack'
+    },
+    {
+      id: 6,
+      name: 'Chicken and Chips',
+      description: 'Golden fried chicken pieces served with a generous portion of crispy french fries.',
+      price: 20000,
+      image: '/menu/chicken_chips.jpeg',
+      category: 'Fast Food',
+      popular: true,
+      rating: 4.7,
+      customizable: false,
+      type: 'Fast Food'
+    },
+    {
+      id: 7,
+      name: 'Beef Samosas (3 pcs)',
+      description: 'Crispy, triangular pastries filled with seasoned minced beef, a delightful snack.',
+      price: 6000,
+      image: '/menu/samosas.jpeg',
+      category: 'Snacks',
+      popular: false,
+      rating: 4.4,
+      customizable: false,
+      type: 'Snack'
+    },
+    {
+      id: 8,
+      name: 'Vegetable Pizza',
+      description: 'A delicious pizza topped with a colorful array of fresh seasonal vegetables and mozzarella cheese.',
+      price: 25000,
+      image: '/menu/veg_pizza.jpeg',
+      category: 'Pizza',
+      popular: false,
+      rating: 4.3,
+      customizable: true,
+      type: 'Pizza',
+      options: {
+        sizes: [
+          { name: 'Small', price: 25000, serves_people: '1-2' },
+          { name: 'Medium', price: 35000, serves_people: '2-3' },
+          { name: 'Large', price: 45000, serves_people: '3-4' }
+        ]
+      }
+    },
+    {
+      id: 9,
+      name: 'Chicken Pizza',
+      description: 'Succulent chicken pieces, rich tomato sauce, and melted mozzarella on a perfect crust.',
+      price: 30000,
+      image: '/menu/chicken_pizza.jpeg',
+      category: 'Pizza',
+      popular: true,
+      rating: 4.6,
+      customizable: true,
+      type: 'Pizza',
+      options: {
+        sizes: [
+          { name: 'Small', price: 30000, serves_people: '1-2' },
+          { name: 'Medium', price: 40000, serves_people: '2-3' },
+          { name: 'Large', price: 50000, serves_people: '3-4' }
+        ]
+      }
+    },
+    {
+      id: 10,
+      name: 'Lusaniya (Small)',
+      description: 'A shared platter (lusaniya) with an assortment of Ugandan delicacies, perfect for a small group.',
+      price: 50000,
+      image: '/menu/lusaniya_small.jpeg',
+      category: 'Ugandan Platters',
+      popular: true,
+      rating: 4.8,
+      customizable: true,
+      type: 'Lusaniya',
+      options: {
+        sizes: [
+          { name: 'Small', price: 50000, serves_people: '2-3' },
+          { name: 'Medium', price: 75000, serves_people: '4-5' },
+          { name: 'Large', price: 100000, serves_people: '6-8' }
+        ]
+      }
+    },
+    {
+      id: 11,
+      name: 'Fresh Juice',
+      description: 'Refreshing glass of freshly squeezed juice. Ask for available flavors.',
+      price: 7000,
+      image: '/menu/fresh_juice.jpeg',
+      category: 'Drinks',
+      popular: false,
+      rating: 4.5,
+      customizable: false,
+      type: 'Drink'
+    },
+    {
+      id: 12,
+      name: 'Mineral Water',
+      description: 'Chilled bottle of purified mineral water.',
+      price: 3000,
+      image: '/menu/water.jpeg',
+      category: 'Drinks',
+      popular: false,
+      rating: 4.0,
+      customizable: false,
+      type: 'Drink'
+    },
+    // Add more menu items here with relevant categories
+  ], []);
 
-  useEffect(() => {
-    if (currentCustomizingItem) {
-      setCurrentCustomPrice(calculateCustomPrice(
-        currentCustomizingItem,
-        (currentCustomizingItem.type === "Pizza" || currentCustomizingItem.type === "Lusaniya") ? selectedSize : null, // Pass selectedSize for Pizza/Lusaniya
-        currentCustomizingItem.type === "Soup/Sauce" ? selectedFoods : []
-      ));
+  const categories = useMemo(() => ['All', ...new Set(menuItems.map(item => item.category))], [menuItems]);
+
+  const filteredItems = useMemo(() => {
+    if (selectedCategory === 'All') {
+      return menuItems;
     }
-  }, [selectedFoods, selectedSize, currentCustomizingItem]);
+    return menuItems.filter(item => item.category === selectedCategory);
+  }, [selectedCategory, menuItems]);
+
+  const getTotalItems = () => cart.reduce((total, item) => total + item.quantity, 0);
+  const getTotalPrice = () => cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+
+  const handleNavClick = (sectionId) => {
+    document.getElementById(sectionId).scrollIntoView({ behavior: 'smooth' });
+    setIsMobileMenuOpen(false); // Close mobile menu after clicking
+  };
 
   const handleAddToCartClick = (item) => {
     if (item.customizable) {
       setCurrentCustomizingItem(item);
-      setSelectedFoods([]); // Reset for local dishes
-      setSelectedSize(null); // Reset for pizzas and lusaniya
+      setSelectedFoods([]); // Reset selected foods for new customization
+      setSelectedSize(null); // Reset selected size for new customization
       setIsCustomizationOpen(true);
     } else {
       addToCart(item);
     }
   };
 
+  const addToCart = (itemToAdd, customization = null, price = itemToAdd.price) => {
+    setCart(prevCart => {
+      const existingItemIndex = prevCart.findIndex(
+        cartItem => cartItem.id === itemToAdd.id && JSON.stringify(cartItem.customization) === JSON.stringify(customization)
+      );
+
+      if (existingItemIndex > -1) {
+        const updatedCart = [...prevCart];
+        updatedCart[existingItemIndex].quantity += 1;
+        return updatedCart;
+      } else {
+        return [...prevCart, { ...itemToAdd, quantity: 1, customization, price }];
+      }
+    });
+  };
+
+  const updateQuantity = (itemId, newQuantity) => {
+    setCart(prevCart => {
+      const updatedCart = prevCart.map(item =>
+        item.id === itemId
+          ? { ...item, quantity: newQuantity }
+          : item
+      ).filter(item => item.quantity > 0);
+      return updatedCart;
+    });
+  };
+
   const handleAddCustomDishToCart = () => {
     if (!currentCustomizingItem) return;
 
-    let customizedItem = { ...currentCustomizingItem };
+    let finalPrice = currentCustomizingItem.price;
+    let customizationDetails = {};
 
     if (currentCustomizingItem.type === "Soup/Sauce") {
+      // For Soup/Sauce, the base price is currentCustomizingItem.price, and additional foods add to it.
       if (selectedFoods.length === 0) {
-        alert("Please select at least one food item for your soup/sauce.");
+        alert("Please select at least one food item.");
         return;
       }
-      customizedItem = {
-        ...customizedItem,
-        id: `${currentCustomizingItem.id}-${Date.now()}-${selectedFoods.map(f => f.name).sort().join('-')}`, // Unique ID
-        name: `${currentCustomizingItem.name} with ${selectedFoods.map(f => f.name).join(', ')}`,
-        price: currentCustomPrice,
-        customization: {
-          type: "Soup/Sauce",
-          base: { name: currentCustomizingItem.name, price: currentCustomizingItem.price },
-          foods: selectedFoods
-        }
-      };
-    } else if (currentCustomizingItem.type === "Pizza" || currentCustomizingItem.type === "Lusaniya") { // Added Lusaniya
+      const foodsPrice = selectedFoods.reduce((sum, food) => sum + food.price, 0);
+      finalPrice = currentCustomizingItem.price + foodsPrice;
+      customizationDetails = { type: "Soup/Sauce", foods: selectedFoods };
+    } else if (currentCustomizingItem.type === "Pizza" || currentCustomizingItem.type === "Lusaniya") {
       if (!selectedSize) {
-        alert(`Please select a size for your ${currentCustomizingItem.name}.`);
+        alert("Please select a size.");
         return;
       }
-      customizedItem = {
-        ...customizedItem,
-        id: `${currentCustomizingItem.id}-${Date.now()}-${selectedSize.name}`, // Unique ID
-        name: `${currentCustomizingItem.name} (${selectedSize.name})`,
-        price: currentCustomPrice,
-        customization: {
-          type: currentCustomizingItem.type, // Pizza or Lusaniya
-          size: selectedSize
-        }
-      };
-    } else {
-      // Should not happen if customizable is handled correctly
-      addToCart(currentCustomizingItem);
-      setIsCustomizationOpen(false);
-      setCurrentCustomizingItem(null);
-      setSelectedFoods([]);
-      setSelectedSize(null);
-      return;
+      finalPrice = selectedSize.price;
+      customizationDetails = { type: currentCustomizingItem.type, size: selectedSize };
     }
 
-    addToCart(customizedItem);
+    addToCart(currentCustomizingItem, customizationDetails, finalPrice);
     setIsCustomizationOpen(false);
     setCurrentCustomizingItem(null);
     setSelectedFoods([]);
     setSelectedSize(null);
   };
 
+  const currentCustomPrice = useMemo(() => {
+    if (!currentCustomizingItem) return 0;
 
-  const addToCart = (item) => {
-    setCart(prevCart => {
-      // For non-customizable items, or distinct customizable items
-      const existingItem = prevCart.find(cartItem => cartItem.id === item.id);
-      if (existingItem) {
-        // If it's a non-customizable item or an identical customized item (same ID generated)
-        return prevCart.map(cartItem =>
-          cartItem.id === item.id
-            ? { ...cartItem, quantity: cartItem.quantity + 1 }
-            : cartItem
-        );
-      }
-      return [...prevCart, { ...item, quantity: 1 }];
-    });
-  };
-
-  const removeFromCart = (itemId) => {
-    setCart(prevCart => prevCart.filter(item => item.id !== itemId));
-  };
-
-  const updateQuantity = (itemId, newQuantity) => {
-    if (newQuantity === 0) {
-      removeFromCart(itemId);
-      return;
+    if (currentCustomizingItem.type === "Soup/Sauce") {
+      const foodsPrice = selectedFoods.reduce((sum, food) => sum + food.price, 0);
+      return currentCustomizingItem.price + foodsPrice;
+    } else if (currentCustomizingItem.type === "Pizza" || currentCustomizingItem.type === "Lusaniya") {
+      return selectedSize ? selectedSize.price : 0;
     }
-    setCart(prevCart =>
-      prevCart.map(item =>
-        item.id === itemId ? { ...item, quantity: newQuantity } : item
-      )
-    );
-  };
+    return currentCustomizingItem.price;
+  }, [currentCustomizingItem, selectedFoods, selectedSize]);
 
-  const getTotalPrice = () => {
-    return cart.reduce((total, item) => total + (item.price * item.quantity), 0);
-  };
-
-  const getTotalItems = () => {
-    return cart.reduce((total, item) => total + item.quantity, 0);
-  };
-
-  const filteredItems = selectedCategory === 'All'
-    ? menuItems
-    : menuItems.filter(item => item.category === selectedCategory);
 
   const handleOrder = () => {
-    console.log('Order placed:', cart);
-    setIsOrderModalOpen(true);
+    // In a real application, you'd send this order to a backend.
+    // For this example, we'll just show a confirmation modal and clear the cart.
+    console.log("Order placed:", cart);
     setCart([]);
     setIsCartOpen(false);
+    setIsOrderModalOpen(true);
   };
 
-  const handleNavClick = (sectionId) => {
-    document.getElementById(sectionId).scrollIntoView({ behavior: 'smooth' });
-    setIsMobileMenuOpen(false);
-  };
 
   return (
     <>
-      <Head>
-        <title>Marynan Bites Restaurant - Authentic Ugandan & More!</title>
-        <meta name="description" content="Experience delicious Ugandan local dishes, pizza, chicken, and chips at Marynan Bites Restaurant. Order online for delivery." />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-      </Head>
-
+      
       <div className="min-h-screen bg-gray-50">
         {/* Header */}
         <header className="bg-white shadow-lg sticky top-0 z-40">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-16">
               <div className="flex items-center">
-                <h1 className="text-2xl font-bold text-gray-900">Marynan Bites</h1>
+                {/* Use a link for the logo/title for better navigation and SEO */}
+                <a href="#home" className="text-2xl font-bold text-gray-900" aria-label="Marynan Bites Home">Marynan Bites</a>
               </div>
 
               {/* Desktop Navigation */}
-              <nav className="hidden md:flex space-x-8">
+              <nav className="hidden md:flex space-x-8" aria-label="Main Navigation">
                 <a href="#home" className="text-gray-900 hover:text-orange-600 transition-colors">Home</a>
                 <a href="#menu" className="text-gray-900 hover:text-orange-600 transition-colors">Menu</a>
                 <a href="#about" className="text-gray-900 hover:text-orange-600 transition-colors">About</a>
@@ -590,11 +350,12 @@ export default function RestaurantLandingPage() {
                 <button
                   onClick={() => setIsCartOpen(true)}
                   className="relative bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition-colors flex items-center space-x-2"
+                  aria-label={`Shopping cart with ${getTotalItems()} items`}
                 >
                   <ShoppingCart className="h-5 w-5" />
                   <span className="hidden sm:inline">Cart</span>
                   {getTotalItems() > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm">
+                    <span className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm" aria-live="polite">
                       {getTotalItems()}
                     </span>
                   )}
@@ -604,6 +365,9 @@ export default function RestaurantLandingPage() {
                 <button
                   onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                   className="md:hidden p-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+                  aria-controls="mobile-menu"
+                  aria-expanded={isMobileMenuOpen}
+                  aria-label="Toggle mobile menu"
                 >
                   <Menu className="h-6 w-6" />
                 </button>
@@ -613,7 +377,7 @@ export default function RestaurantLandingPage() {
 
           {/* Mobile Navigation Menu */}
           {isMobileMenuOpen && (
-            <div className="md:hidden border-t border-gray-200 bg-white">
+            <div className="md:hidden border-t border-gray-200 bg-white" id="mobile-menu">
               <div className="px-4 py-2 space-y-1">
                 <button
                   onClick={() => handleNavClick('home')}
@@ -647,20 +411,23 @@ export default function RestaurantLandingPage() {
         {/* Hero Section */}
         <section id="home" className="relative h-screen">
           <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/50 z-10"></div>
-          <div className="absolute inset-0 bg-cover bg-center" style={{backgroundImage: "url('/banner2.jpg')"}}></div>
+          {/* Add descriptive alt text to images for SEO and accessibility */}
+          <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('/mummy.webp')" }} role="img" aria-label="Delicious Ugandan food spread on a table at Marynan Bites Restaurant"></div>
 
           <div className="relative z-20 text-white px-4 h-full flex justify-center items-center w-full lg:w-1/2">
             <div className="text-center lg:text-left">
+              {/* Stronger heading tags for main messages */}
               <h1 className="block text-2xl md:text-3xl py-3">Welcome To <span className="text-orange-400">Marynan Bites</span> Restaurant</h1>
               <h2 className="text-4xl md:text-5xl lg:text-7xl font-bold mb-6">
                 Authentic
                 <span className="block text-orange-400">Ugandan Flavors</span>
               </h2>
+              {/* Include location in descriptive text */}
               <p className="text-lg md:text-xl lg:text-2xl mb-8 max-w-2xl">
-                Savor delicious local dishes, mouth-watering pizza, crispy chicken, and golden chips.
+                Savor delicious local dishes, mouth-watering pizza, crispy chicken, and golden chips at our restaurant in <strong>Bunamwaya, Kampala</strong>.
               </p>
               <p className="text-lg md:text-xl lg:text-2xl mb-8 max-w-2xl">
-                We offer both dine-in and speedy <span className="underline decoration-orange-400">Delivery</span> services!
+                We offer both dine-in and speedy <span className="underline decoration-orange-400">Delivery</span> services to Bunamwaya and surrounding areas!
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <button
@@ -684,9 +451,9 @@ export default function RestaurantLandingPage() {
         <section id="menu" className="py-20 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold text-gray-900 mb-4">Our Menu</h2>
+              <h2 className="text-4xl font-bold text-gray-900 mb-4">Our Delicious Menu - Ugandan, Pizza & More!</h2>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                Discover our diverse selection, from traditional Ugandan delicacies to international favorites.
+                Discover our diverse selection, from traditional <strong>Ugandan delicacies</strong> and <strong>Luwombo</strong> to international favorites like <strong>Pizza</strong> and <strong>Chicken & Chips</strong>. Available for dine-in, takeaway, and <strong>delivery in Bunamwaya</strong> and beyond.
               </p>
             </div>
 
@@ -702,6 +469,7 @@ export default function RestaurantLandingPage() {
                         ? 'bg-orange-600 text-white'
                         : 'text-gray-700 hover:bg-gray-200'
                     }`}
+                    aria-pressed={selectedCategory === category}
                   >
                     {category}
                   </button>
@@ -714,9 +482,10 @@ export default function RestaurantLandingPage() {
               {filteredItems.map(item => (
                 <div key={item.id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
                   <div className="relative h-48">
+                    {/* Alt text for menu item images */}
                     <img
                       src={item.image}
-                      alt={item.name}
+                      alt={`${item.name} from Marynan Bites Restaurant`}
                       className="w-full h-full object-cover"
                     />
                     {item.popular && (
@@ -729,7 +498,7 @@ export default function RestaurantLandingPage() {
                   <div className="p-6">
                     <div className="flex justify-between items-start mb-2">
                       <h3 className="text-xl font-bold text-gray-900">{item.name}</h3>
-                      <div className="flex items-center space-x-1">
+                      <div className="flex items-center space-x-1" aria-label={`Rating: ${item.rating} out of 5 stars`}>
                         <Star className="h-4 w-4 text-yellow-400 fill-current" />
                         <span className="text-sm text-gray-600">{item.rating}</span>
                       </div>
@@ -746,6 +515,7 @@ export default function RestaurantLandingPage() {
                       <button
                         onClick={() => handleAddToCartClick(item)}
                         className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors flex items-center space-x-2"
+                        aria-label={`Add ${item.name} to cart`}
                       >
                         <Plus className="h-4 w-4" />
                         <span>
@@ -767,22 +537,20 @@ export default function RestaurantLandingPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div>
-                <h2 className="text-4xl font-bold text-gray-900 mb-6">About Marynan Bites Restaurant</h2>
+                <h2 className="text-4xl font-bold text-gray-900 mb-6">About Marynan Bites Restaurant in Bunamwaya</h2>
                 <p className="text-lg text-gray-600 mb-6">
-                MARYNAN Bites Restaurant is inspired by our beloved mother Mary Nantaayi, who brings over 25 years of experience in the catering industry, serving the Bunamwaya community and its surrounding areas. Her passion for food and dedication to quality have been the heart of every meal she prepares.
-
+                  <strong>MARYNAN Bites Restaurant</strong> is inspired by our beloved mother Mary Nantaayi, who brings over 25 years of experience in the catering industry, serving the <strong>Bunamwaya community</strong> and its surrounding areas. Her passion for food and dedication to quality have been the heart of every meal she prepares.
                 </p>
                 <p className="text-lg text-gray-600 mb-8">
-                 Driven by her expertise and love for cooking, we teamed up as a family to create MARYNAN Bites—a place where every bite is crafted to leave you craving more. From traditional flavors to modern twists, our menu is full of dishes made with care, flavor, and a touch of home.
-
-                 We offer dine-in and delivery services, with a wide selection of snacks, local foods, and more. Whether you're looking for a quick bite or a hearty meal, come and experience the best of Ugandan cuisine with us.
-
-                  Let us serve you food you'll always remember.
+                  Driven by her expertise and love for cooking, we teamed up as a family to create MARYNAN Bites—a place where every bite is crafted to leave you craving more. From traditional <strong>Ugandan flavors</strong> to modern twists, our menu is full of dishes made with care, flavor, and a touch of home.
+                </p>
+                <p className="text-lg text-gray-600 mb-8">
+                  We offer convenient <strong>dine-in</strong> and <strong>delivery services</strong> across <strong>Kampala</strong>, with a wide selection of snacks, local foods, and more. Whether you're looking for a quick bite or a hearty meal, come and experience the best of <strong>Ugandan cuisine</strong> with us at our Bunamwaya location.
                 </p>
 
                 <div className="grid grid-cols-3 gap-8 text-center">
                   <div>
-                    <div className="text-3xl font-bold text-orange-600 mb-2">20+</div>
+                    <div className="text-3xl font-bold text-orange-600 mb-2">25+</div> {/* Updated from 20+ to 25+ as per text */}
                     <div className="text-gray-600">Years Experience</div>
                   </div>
                   <div>
@@ -791,15 +559,16 @@ export default function RestaurantLandingPage() {
                   </div>
                   <div>
                     <div className="text-3xl font-bold text-orange-600 mb-2">1000+</div>
-                    <div className="text-gray-600">Happy Customers</div>
+                    <div className="text-600">Happy Customers</div>
                   </div>
                 </div>
               </div>
 
               <div className="relative">
+                {/* Alt text for the "mummy" image */}
                 <img
                   src="/mummy.webp"
-                  alt="Restaurant interior"
+                  alt="Mary Nantaayi, the inspiration behind Marynan Bites Restaurant, preparing food."
                   className="rounded-xl shadow-2xl"
                 />
               </div>
@@ -811,17 +580,20 @@ export default function RestaurantLandingPage() {
         <section id="contact" className="py-20 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold text-gray-900 mb-4">Visit Us</h2>
-              <p className="text-xl text-gray-600">We'd love to welcome you to Marynan Bites Restaurant</p>
+              <h2 className="text-4xl font-bold text-gray-900 mb-4">Visit Marynan Bites in Bunamwaya, Kampala</h2>
+              <p className="text-xl text-gray-600">We'd love to welcome you to Marynan Bites Restaurant or deliver to your doorstep!</p>
             </div>
 
             <div className="grid md:grid-cols-3 gap-8">
-              <a href='https://g.co/kgs/gvxzc8U' target='_blank' rel="noopener noreferrer">
-              <div className="text-center p-8 bg-gray-50 rounded-xl">
+              <a href='https://g.co/kgs/gvxzc8U' target='_blank' rel="noopener noreferrer" className="text-center p-8 bg-gray-50 rounded-xl hover:shadow-lg transition-shadow">
                 <MapPin className="h-12 w-12 text-orange-600 mx-auto mb-4" />
                 <h3 className="text-xl font-bold text-gray-900 mb-2">Location</h3>
-                <p className="text-gray-600">Bunamwaya-Kisigula Rd<br />50 mts off Bunamwaya - Lweza Rd<br />- Kampala-Uganda</p>
-              </div>
+                {/* Specific and clear address for local SEO */}
+                <p className="text-gray-600">
+                  Bunamwaya-Kisigula Rd<br />
+                  50 mts off Bunamwaya - Lweza Rd<br />
+                  <strong>Kampala, Uganda</strong>
+                </p>
               </a>
 
 
@@ -833,9 +605,13 @@ export default function RestaurantLandingPage() {
 
               <div className="text-center p-8 bg-gray-50 rounded-xl">
                 <Phone className="h-12 w-12 text-orange-600 mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Contact</h3>
-                <p className="text-gray-600">Phone: (+256) 758-567701<br />Email: marynanbites@gmail.com
-                <br />Reservations: (+256) 758-567701</p>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Contact Us & Make Reservations</h3>
+                <p className="text-gray-600">
+                  Phone: <a href="tel:+256758567701" className="text-orange-600 hover:underline">(+256) 758-567701</a><br />
+                  Email: <a href="mailto:marynanbites@gmail.com" className="text-orange-600 hover:underline">marynanbites@gmail.com</a>
+                  <br />
+                  Reservations: <a href="tel:+256758567701" className="text-orange-600 hover:underline">(+256) 758-567701</a>
+                </p>
               </div>
             </div>
           </div>
@@ -847,7 +623,7 @@ export default function RestaurantLandingPage() {
             <div className="grid md:grid-cols-4 gap-8">
               <div>
                 <h3 className="text-2xl font-bold mb-4">Marynan Bites</h3>
-                <p className="text-gray-400">Experience exceptional cuisine in an elegant atmosphere.</p>
+                <p className="text-gray-400">Experience exceptional <strong>Ugandan cuisine</strong> in an elegant atmosphere in <strong>Bunamwaya, Kampala</strong>.</p>
               </div>
 
               <div>
@@ -865,7 +641,7 @@ export default function RestaurantLandingPage() {
                 <ul className="space-y-2 text-gray-400">
                   <li>Dine In</li>
                   <li>Takeout</li>
-                  <li>Delivery</li>
+                  <li><strong>Delivery in Kampala</strong></li> {/* Emphasize delivery */}
                   <li>Catering</li>
                 </ul>
               </div>
@@ -873,9 +649,10 @@ export default function RestaurantLandingPage() {
               <div>
                 <h4 className="text-lg font-semibold mb-4">Follow Us</h4>
                 <div className="flex space-x-4">
-                  <a href="#" className="text-gray-400 hover:text-white transition-colors">Facebook</a>
-                  <a href="#" className="text-gray-400 hover:text-white transition-colors">Instagram</a>
-                  <a href="#" className="text-gray-400 hover:text-white transition-colors">Twitter</a>
+                  {/* Real social media links are good for SEO and user engagement */}
+                  <a href="https://www.facebook.com/MarynanBites" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors" aria-label="Follow us on Facebook">Facebook</a>
+                  <a href="https://www.instagram.com/marynanbites" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors" aria-label="Follow us on Instagram">Instagram</a>
+                  <a href="https://twitter.com/MarynanBites" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors" aria-label="Follow us on Twitter">Twitter</a>
                 </div>
               </div>
             </div>
@@ -889,7 +666,7 @@ export default function RestaurantLandingPage() {
         {/* Cart Sidebar */}
         {isCartOpen && (
           <div className="fixed inset-0 z-50 overflow-hidden">
-            <div className="absolute inset-0 bg-black bg-opacity-50" onClick={() => setIsCartOpen(false)}></div>
+            <div className="absolute inset-0 bg-black bg-opacity-50" onClick={() => setIsCartOpen(false)} aria-label="Close cart sidebar"></div>
             <div className="absolute right-0 top-0 h-full w-full max-w-md bg-white shadow-xl">
               <div className="flex flex-col h-full">
                 <div className="flex items-center justify-between p-6 border-b">
@@ -897,6 +674,7 @@ export default function RestaurantLandingPage() {
                   <button
                     onClick={() => setIsCartOpen(false)}
                     className="p-2 hover:bg-gray-100 rounded-full"
+                    aria-label="Close cart"
                   >
                     <X className="h-6 w-6" />
                   </button>
@@ -906,23 +684,21 @@ export default function RestaurantLandingPage() {
                   {cart.length === 0 ? (
                     <p className="text-gray-500 text-center py-8">Your cart is empty</p>
                   ) : (
-                    cart.map(item => (
-                      <div key={item.id} className="flex items-center space-x-4 bg-gray-50 p-4 rounded-lg">
+                    cart.map((item, index) => ( // Added index to key for uniqueness when items are identical but have different customizations
+                      <div key={`${item.id}-${index}`} className="flex items-center space-x-4 bg-gray-50 p-4 rounded-lg">
                         <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded-lg" />
                         <div className="flex-1">
                           <h3 className="font-semibold text-gray-900">{item.name}</h3>
                           {item.customization && item.customization.type === "Soup/Sauce" && (
                             <p className="text-gray-500 text-sm">
-                              Base: {item.customization.base.name}
-                              {item.customization.foods.length > 0 &&
-                                ` | Food(s): ${item.customization.foods.map(f => f.name).join(', ')}`
-                              }
+                              {/* Corrected to display customization details more clearly */}
+                              Food(s): {item.customization.foods.map(f => f.name).join(', ')}
                             </p>
                           )}
                            {item.customization && (item.customization.type === "Pizza" || item.customization.type === "Lusaniya") && (
                             <p className="text-gray-500 text-sm">
                               Size: {item.customization.size.name}
-                              {item.customization.size.serves_people && ` (${item.customization.size.serves_people})`}
+                              {item.customization.size.serves_people && ` (Serves: ${item.customization.size.serves_people})`}
                             </p>
                           )}
                           <p className="text-orange-600 font-bold">UGX {item.price.toLocaleString()}</p>
@@ -931,6 +707,7 @@ export default function RestaurantLandingPage() {
                           <button
                             onClick={() => updateQuantity(item.id, item.quantity - 1)}
                             className="p-1 hover:bg-gray-200 rounded"
+                            aria-label={`Decrease quantity of ${item.name}`}
                           >
                             <Minus className="h-4 w-4" />
                           </button>
@@ -938,6 +715,7 @@ export default function RestaurantLandingPage() {
                           <button
                             onClick={() => updateQuantity(item.id, item.quantity + 1)}
                             className="p-1 hover:bg-gray-200 rounded"
+                            aria-label={`Increase quantity of ${item.name}`}
                           >
                             <Plus className="h-4 w-4" />
                           </button>
@@ -968,21 +746,21 @@ export default function RestaurantLandingPage() {
 
         {/* Order Confirmation Modal */}
         {isOrderModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" role="dialog" aria-modal="true" aria-labelledby="order-confirmed-title">
             <div className="bg-white p-8 rounded-xl max-w-md w-full mx-4">
               <div className="text-center">
                 <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
                   </svg>
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Order Confirmed!</h3>
+                <h3 id="order-confirmed-title" className="text-xl font-bold text-gray-900 mb-2">Order Confirmed!</h3>
                 <p className="text-gray-600 mb-6">Your order has been placed successfully. We'll prepare it right away!</p>
                 <button
                   onClick={() => setIsOrderModalOpen(false)}
                   className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors"
                 >
-                  Continue
+                  Continue Browse
                 </button>
               </div>
             </div>
@@ -991,15 +769,16 @@ export default function RestaurantLandingPage() {
 
         {/* Generic Customization Modal (for Soup/Sauce bases, Pizzas, and Lusaniya) */}
         {isCustomizationOpen && currentCustomizingItem && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" role="dialog" aria-modal="true" aria-labelledby="customize-dish-title">
             <div className="bg-white p-8 rounded-xl max-w-lg w-full mx-4 overflow-y-auto max-h-[90vh]">
               <div className="flex justify-between items-center mb-6 border-b pb-4">
-                <h2 className="text-2xl font-bold text-gray-900">
+                <h2 id="customize-dish-title" className="text-2xl font-bold text-gray-900">
                   Customize Your {currentCustomizingItem.name}
                 </h2>
                 <button
                   onClick={() => setIsCustomizationOpen(false)}
                   className="p-2 hover:bg-gray-100 rounded-full"
+                  aria-label="Close customization options"
                 >
                   <X className="h-6 w-6" />
                 </button>
@@ -1026,6 +805,7 @@ export default function RestaurantLandingPage() {
                               ? 'border-orange-600 bg-orange-50'
                               : 'border-gray-300 hover:border-gray-400'
                           }`}
+                          aria-pressed={selectedFoods.some(f => f.name === food.name)}
                         >
                           <p className="font-medium text-gray-900">{food.name}</p>
                           {food.price > 0 && <p className="text-sm text-gray-600">+UGX {food.price.toLocaleString()}</p>}
@@ -1049,6 +829,7 @@ export default function RestaurantLandingPage() {
                               ? 'border-orange-600 bg-orange-50'
                               : 'border-gray-300 hover:border-gray-400'
                           }`}
+                          aria-pressed={selectedSize?.name === size.name}
                         >
                           <p className="font-medium text-gray-900">{size.name}</p>
                           <p className="text-sm text-gray-600">UGX {size.price.toLocaleString()}</p>
@@ -1065,7 +846,6 @@ export default function RestaurantLandingPage() {
                 <button
                   onClick={handleAddCustomDishToCart}
                   className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
-                  // Disable if no selection made based on type
                   disabled={
                     (currentCustomizingItem.type === "Soup/Sauce" && selectedFoods.length === 0) ||
                     ((currentCustomizingItem.type === "Pizza" || currentCustomizingItem.type === "Lusaniya") && !selectedSize)
@@ -1081,5 +861,3 @@ export default function RestaurantLandingPage() {
     </>
   );
 }
-//test
-//yudygwuygdyug
