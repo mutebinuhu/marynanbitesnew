@@ -16,204 +16,389 @@ export default function Home() {
   const [selectedSize, setSelectedSize] = useState(null); // For Pizza/Lusaniya customization
 
   // Define your menu items and categories
-  const menuItems = useMemo(() => [
-    {
-      id: 1,
-      name: 'Katogo (Matooke)',
-      description: 'A hearty Ugandan breakfast featuring mashed matooke (green bananas) cooked with offals, groundnuts, beans or beef.',
-      price: 15000,
-      image: '/menu/katogo.jpeg',
-      category: 'Ugandan Dishes',
-      popular: true,
-      rating: 4.8,
-      customizable: false,
-      type: 'Ugandan Dish'
-    },
-    {
-      id: 2,
-      name: 'Luwombo (Groundnut Sauce)',
-      description: 'Steamed groundnut sauce, traditionally cooked in banana leaves, served with your choice of food items.',
-      price: 25000,
-      image: '/menu/luwombo_groundnut.jpeg',
-      category: 'Ugandan Dishes',
-      popular: false,
-      rating: 4.5,
-      customizable: true,
-      type: 'Soup/Sauce',
-      options: {
-        foods: [
-          { name: 'Matooke', price: 0 },
-          { name: 'Rice', price: 0 },
-          { name: 'Posho', price: 0 },
-          { name: 'Cassava', price: 0 },
-          { name: 'Sweet Potatoes', price: 0 },
-          { name: 'Irish Potatoes', price: 0 },
-          { name: 'Pumpkin', price: 0 },
-          { name: 'Greens', price: 0 },
-          { name: 'Avocado', price: 0 },
-          { name: 'Chapati', price: 1000 },
-          { name: 'Rolex', price: 3000 }
-        ]
-      }
-    },
-    {
-      id: 3,
-      name: 'Luwombo (Beef)',
-      description: 'Tender beef stew, slow-cooked in banana leaves for maximum flavor, served with your choice of food items.',
-      price: 30000,
-      image: '/menu/luwombo_beef.jpeg',
-      category: 'Ugandan Dishes',
-      popular: true,
-      rating: 4.7,
-      customizable: true,
-      type: 'Soup/Sauce',
-      options: {
-        foods: [
-          { name: 'Matooke', price: 0 },
-          { name: 'Rice', price: 0 },
-          { name: 'Posho', price: 0 },
-          { name: 'Cassava', price: 0 },
-          { name: 'Sweet Potatoes', price: 0 },
-          { name: 'Irish Potatoes', price: 0 },
-          { name: 'Pumpkin', price: 0 },
-          { name: 'Greens', price: 0 },
-          { name: 'Avocado', price: 0 },
-          { name: 'Chapati', price: 1000 },
-          { name: 'Rolex', price: 3000 }
-        ]
-      }
-    },
-    {
-      id: 4,
-      name: 'Whole Tilapia',
-      description: 'Crispy fried whole tilapia, seasoned to perfection and served with a side of your choice.',
-      price: 35000,
-      image: '/menu/whole_tilapia.jpeg',
-      category: 'Ugandan Dishes',
-      popular: false,
-      rating: 4.6,
-      customizable: false,
-      type: 'Ugandan Dish'
-    },
-    {
-      id: 5,
-      name: 'Ugandan Rolex',
-      description: 'A popular Ugandan street food: chapati rolled with an omelette and fresh vegetables.',
-      price: 5000,
-      image: '/menu/rolex.jpeg',
-      category: 'Snacks',
-      popular: true,
-      rating: 4.9,
-      customizable: false,
-      type: 'Snack'
-    },
-    {
-      id: 6,
-      name: 'Chicken and Chips',
-      description: 'Golden fried chicken pieces served with a generous portion of crispy french fries.',
-      price: 20000,
-      image: '/menu/chicken_chips.jpeg',
-      category: 'Fast Food',
-      popular: true,
-      rating: 4.7,
-      customizable: false,
-      type: 'Fast Food'
-    },
-    {
-      id: 7,
-      name: 'Beef Samosas (3 pcs)',
-      description: 'Crispy, triangular pastries filled with seasoned minced beef, a delightful snack.',
-      price: 6000,
-      image: '/menu/samosas.jpeg',
-      category: 'Snacks',
-      popular: false,
-      rating: 4.4,
-      customizable: false,
-      type: 'Snack'
-    },
-    {
-      id: 8,
-      name: 'Vegetable Pizza',
-      description: 'A delicious pizza topped with a colorful array of fresh seasonal vegetables and mozzarella cheese.',
-      price: 25000,
-      image: '/menu/veg_pizza.jpeg',
-      category: 'Pizza',
-      popular: false,
-      rating: 4.3,
-      customizable: true,
-      type: 'Pizza',
-      options: {
-        sizes: [
-          { name: 'Small', price: 25000, serves_people: '1-2' },
-          { name: 'Medium', price: 35000, serves_people: '2-3' },
-          { name: 'Large', price: 45000, serves_people: '3-4' }
-        ]
-      }
-    },
-    {
-      id: 9,
-      name: 'Chicken Pizza',
-      description: 'Succulent chicken pieces, rich tomato sauce, and melted mozzarella on a perfect crust.',
-      price: 30000,
-      image: '/menu/chicken_pizza.jpeg',
-      category: 'Pizza',
-      popular: true,
-      rating: 4.6,
-      customizable: true,
-      type: 'Pizza',
-      options: {
-        sizes: [
-          { name: 'Small', price: 30000, serves_people: '1-2' },
-          { name: 'Medium', price: 40000, serves_people: '2-3' },
-          { name: 'Large', price: 50000, serves_people: '3-4' }
-        ]
-      }
-    },
-    {
-      id: 10,
-      name: 'Lusaniya (Small)',
-      description: 'A shared platter (lusaniya) with an assortment of Ugandan delicacies, perfect for a small group.',
-      price: 50000,
-      image: '/menu/lusaniya_small.jpeg',
-      category: 'Ugandan Platters',
-      popular: true,
-      rating: 4.8,
-      customizable: true,
-      type: 'Lusaniya',
-      options: {
-        sizes: [
-          { name: 'Small', price: 50000, serves_people: '2-3' },
-          { name: 'Medium', price: 75000, serves_people: '4-5' },
-          { name: 'Large', price: 100000, serves_people: '6-8' }
-        ]
-      }
-    },
-    {
-      id: 11,
-      name: 'Fresh Juice',
-      description: 'Refreshing glass of freshly squeezed juice. Ask for available flavors.',
-      price: 7000,
-      image: '/menu/fresh_juice.jpeg',
-      category: 'Drinks',
-      popular: false,
-      rating: 4.5,
-      customizable: false,
-      type: 'Drink'
-    },
-    {
-      id: 12,
-      name: 'Mineral Water',
-      description: 'Chilled bottle of purified mineral water.',
-      price: 3000,
-      image: '/menu/water.jpeg',
-      category: 'Drinks',
-      popular: false,
-      rating: 4.0,
-      customizable: false,
-      type: 'Drink'
-    },
-    // Add more menu items here with relevant categories
-  ], []);
+  
+const menuItems = [
+  {
+    id: 1,
+    name: "Luwombo (Chicken/Beef)",
+    description: "Steamed chicken or beef in groundnut sauce, a traditional Ugandan delicacy, served with matooke.",
+    price: 35000, // Fixed price, not customizable like others
+    category: "Local Dishes",
+    image: "/api/placeholder/300/200?text=Luwombo",
+    rating: 4.9,
+    popular: true,
+    customizable: false // Luwombo is NOT customizable
+  },
+  // New customizable "Soup/Sauce" items
+  {
+    id: 15,
+    name: "Groundnut Soup Base",
+    description: "Rich and savory groundnut soup, customize with your choice of staple foods.",
+    price: 15000, // Base price for the soup/sauce
+    category: "Local Dishes",
+    image: "/api/placeholder/300/200?text=Groundnut Soup",
+    customizable: true,
+    type: "Soup/Sauce",
+    options: {
+      foods: [
+        { name: "Matooke", price: 0 },
+        { name: "Rice", price: 0 },
+        { name: "Posho", price: 0 },
+        { name: "Sweet Potatoes", price: 0 },
+        { name: "Cassava", price: 0 },
+        { name: "Irish Potatoes", price: 0 },
+        { name: "Chapati", price: 3000 }
+      ]
+    }
+  },
+  {
+    id: 16,
+    name: "Beans Soup Base",
+    description: "Hearty bean soup, perfect with your choice of staple foods.",
+    price: 12000,
+    category: "Local Dishes",
+    image: "/api/placeholder/300/200?text=Beans Soup",
+    customizable: true,
+    type: "Soup/Sauce",
+    options: {
+      foods: [
+        { name: "Matooke", price: 0 },
+        { name: "Rice", price: 0 },
+        { name: "Posho", price: 0 },
+        { name: "Sweet Potatoes", price: 0 },
+        { name: "Cassava", price: 0 },
+        { name: "Irish Potatoes", price: 0 },
+        { name: "Chapati", price: 3000 }
+      ]
+    }
+  },
+  {
+    id: 17,
+    name: "Chicken Soup Base",
+    description: "Delicious chicken soup, customize with your preferred staple foods.",
+    price: 20000,
+    category: "Local Dishes",
+    image: "/api/placeholder/300/200?text=Chicken Soup",
+    customizable: true,
+    type: "Soup/Sauce",
+    options: {
+      foods: [
+        { name: "Matooke", price: 0 },
+        { name: "Rice", price: 0 },
+        { name: "Posho", price: 0 },
+        { name: "Sweet Potatoes", price: 0 },
+        { name: "Cassava", price: 0 },
+        { name: "Irish Potatoes", price: 0 },
+        { name: "Chapati", price: 3000 }
+      ]
+    }
+  },
+  {
+    id: 18,
+    name: "Gnuts with Fish Soup Base",
+    description: "Groundnut soup with fish, pair it with your favorite staple foods.",
+    price: 25000,
+    category: "Local Dishes",
+    image: "/api/placeholder/300/200?text=Gnuts + Fish",
+    customizable: true,
+    type: "Soup/Sauce",
+    options: {
+      foods: [
+        { name: "Matooke", price: 0 },
+        { name: "Rice", price: 0 },
+        { name: "Posho", price: 0 },
+        { name: "Sweet Potatoes", price: 0 },
+        { name: "Cassava", price: 0 },
+        { name: "Irish Potatoes", price: 0 },
+        { name: "Chapati", price: 3000 }
+      ]
+    }
+  },
+  {
+    id: 2,
+    name: "Rolex",
+    description: "A popular Ugandan street food; chapati rolled with an omelette and vegetables.",
+    price: 8000,
+    category: "Local Dishes",
+    image: "/api/placeholder/300/200?text=Rolex",
+    rating: 4.7,
+    customizable: false // Rolex is NOT customizable in this way
+  },
+  {
+    id: 4,
+    name: "Katogo",
+    description: "A hearty breakfast dish: matooke cooked with offals or beef, often with groundnut sauce.",
+    price: 20000,
+    category: "Local Dishes",
+    image: "/api/placeholder/300/200?text=Katogo",
+    rating: 4.6,
+    popular: true,
+    customizable: false // Katogo is NOT customizable
+  },
+  {
+    id: 5,
+    name: "Whole Tilapia Fish",
+    description: "Grilled or fried whole tilapia fish, served with a side of kachumbari (fresh salad).",
+    price: 45000,
+    category: "Local Dishes",
+    image: "/api/placeholder/300/200?text=Tilapia",
+    rating: 4.8,
+    customizable: false // Tilapia is NOT customizable
+  },
+  {
+    id: 6,
+    name: "Margherita Pizza",
+    description: "Classic pizza with fresh mozzarella, tomato sauce and basil.",
+    price: 0, // Base price will be determined by size
+    category: "Pizza",
+    image: "/api/placeholder/300/200?text=Margherita Pizza",
+    rating: 4.6,
+    customizable: true,
+    type: "Pizza",
+    options: {
+      sizes: [
+        { name: "Small", price: 30000 },
+        { name: "Medium", price: 45000 },
+        { name: "Large", price: 60000 }
+      ]
+    }
+  },
+  {
+    id: 7,
+    name: "Chicken Tikka Pizza",
+    description: "Tandoori chicken pieces, onions, bell peppers, and mozzarella cheese on a crispy crust.",
+    price: 0, // Base price will be determined by size
+    category: "Pizza",
+    image: "/api/placeholder/300/200?text=Chicken Tikka Pizza",
+    rating: 4.7,
+    customizable: true,
+    type: "Pizza",
+    options: {
+      sizes: [
+        { name: "Small", price: 40000 },
+        { name: "Medium", price: 55000 },
+        { name: "Large", price: 70000 }
+      ]
+    }
+  },
+  {
+    id: 8,
+    name: "Beef Sausage Pizza",
+    description: "Savory beef sausage, mushrooms, olives, and mozzarella cheese.",
+    price: 0, // Base price will be determined by size
+    category: "Pizza",
+    image: "/api/placeholder/300/200?text=Beef Sausage Pizza",
+    rating: 4.5,
+    customizable: true,
+    type: "Pizza",
+    options: {
+      sizes: [
+        { name: "Small", price: 38000 },
+        { name: "Medium", price: 52000 },
+        { name: "Large", price: 67000 }
+      ]
+    }
+  },
+  {
+    id: 9,
+    name: "Full Roasted Chicken",
+    description: "Slow-roasted whole chicken, tender and juicy, seasoned to perfection.",
+    price: 60000,
+    category: "Chicken",
+    image: "/api/placeholder/300/200?text=Roasted Chicken",
+    rating: 4.8,
+    popular: true
+  },
+  {
+    id: 10,
+    name: "Half Fried Chicken",
+    description: "Crispy fried half chicken, golden brown and packed with flavor.",
+    price: 35000,
+    category: "Chicken",
+    image: "/api/placeholder/300/200?text=Fried Chicken",
+    rating: 4.7
+  },
+  {
+    id: 11,
+    name: "Chicken Wings (6 pcs)",
+    description: "Six succulent chicken wings, choice of BBQ, spicy, or plain.",
+    price: 25000,
+    category: "Chicken",
+    image: "/api/placeholder/300/200?text=Chicken Wings",
+    rating: 4.6
+  },
+  {
+    id: 12,
+    name: "Regular Chips (Fries)",
+    description: "Perfectly golden and crispy french fries, lightly salted.",
+    price: 10000,
+    category: "Chips",
+    image: "/api/placeholder/300/200?text=Chips",
+    rating: 4.4
+  },
+  {
+    id: 13,
+    name: "Chips with Chicken (Small)",
+    description: "A small portion of crispy chips served with tender pieces of fried chicken.",
+    price: 20000,
+    category: "Chips",
+    image: "/api/placeholder/300/200?text=Chips + Chicken",
+    rating: 4.6
+  },
+  {
+    id: 14,
+    name: "Chips with Beef",
+    description: "Crispy chips served with savory stir-fried beef strips.",
+    price: 25000,
+    category: "Chips",
+    image: "/api/placeholder/300/200?text=Chips + Beef",
+    rating: 4.5
+  },
+  // New Snacks Category
+  {
+    id: 19,
+    name: "Samosa (Beef)",
+    description: "Crispy pastry filled with spiced minced beef.",
+    price: 3000,
+    category: "Snacks",
+    image: "/api/placeholder/300/200?text=Samosa Beef",
+    rating: 4.5,
+    customizable: false
+  },
+  {
+    id: 20,
+    name: "Samosa (Vegetable)",
+    description: "Crispy pastry filled with spiced mixed vegetables.",
+    price: 2500,
+    category: "Snacks",
+    image: "/api/placeholder/300/200?text=Samosa Veg",
+    rating: 4.3,
+    customizable: false
+  },
+  {
+    id: 21,
+    name: "Meat Kebab",
+    description: "Grilled minced meat on a skewer, seasoned with herbs.",
+    price: 5000,
+    category: "Snacks",
+    image: "/api/placeholder/300/200?text=Meat Kebab",
+    rating: 4.6,
+    customizable: false
+  },
+  {
+    id: 22,
+    name: "Chicken Kebab",
+    description: "Grilled marinated chicken pieces on a skewer.",
+    price: 6000,
+    category: "Snacks",
+    image: "/api/placeholder/300/200?text=Chicken Kebab",
+    rating: 4.7,
+    customizable: false
+  },
+  {
+    id: 23,
+    name: "Chapati",
+    description: "Soft, flaky flatbread, perfect as a side or snack.",
+    price: 2000,
+    category: "Snacks",
+    image: "/api/placeholder/300/200?text=Chapati",
+    rating: 4.2,
+    customizable: false
+  },
+  {
+    id: 24,
+    name: "Crunchies",
+    description: "Crispy fried dough sticks, a popular Ugandan snack.",
+    price: 3000,
+    category: "Snacks",
+    image: "/api/placeholder/300/200?text=Crunchies",
+    rating: 4.4,
+    customizable: false
+  },
+  {
+    id: 25,
+    name: "Mandazi",
+    description: "Sweet, fluffy East African doughnuts.",
+    price: 1500,
+    category: "Snacks",
+    image: "/api/placeholder/300/200?text=Mandazi",
+    rating: 4.1,
+    customizable: false
+  },
+  {
+    id: 26,
+    name: "Half Cakes",
+    description: "Small, sweet, and soft baked cakes.",
+    price: 1000,
+    category: "Snacks",
+    image: "/api/placeholder/300/200?text=Half Cakes",
+    rating: 4.0,
+    customizable: false
+  },
+  // New Juices Category
+  {
+    id: 27,
+    name: "Fresh Mango Juice",
+    description: "Refreshing juice made from ripe, sweet mangoes.",
+    price: 8000,
+    category: "Juices",
+    image: "/api/placeholder/300/200?text=Mango Juice",
+    rating: 4.8,
+    customizable: false
+  },
+  {
+    id: 28,
+    name: "Fresh Passion Fruit Juice",
+    description: "Tangy and sweet juice from fresh passion fruits.",
+    price: 7000,
+    category: "Juices",
+    image: "/api/placeholder/300/200?text=Passion Juice",
+    rating: 4.7,
+    customizable: false
+  },
+  {
+    id: 29,
+    name: "Fresh Watermelon Juice",
+    description: "Hydrating and sweet juice from fresh watermelon.",
+    price: 6000,
+    category: "Juices",
+    image: "/api/placeholder/300/200?text=Watermelon Juice",
+    rating: 4.6,
+    customizable: false
+  },
+  {
+    id: 30,
+    name: "Mixed Fruit Juice",
+    description: "A delightful blend of seasonal fresh fruits.",
+    price: 9000,
+    category: "Juices",
+    image: "/api/placeholder/300/200?text=Mixed Juice",
+    rating: 4.9,
+    customizable: false
+  },
+  // New Lusaniya Category
+  {
+    id: 31,
+    name: "Lusaniya Platter",
+    description: "A traditional Ugandan sharing platter with assorted meats, staples, and sauces.",
+    price: 0, // Price determined by size
+    category: "Lusaniya",
+    image: "/api/placeholder/300/200?text=Lusaniya",
+    rating: 4.9,
+    popular: true,
+    customizable: true,
+    type: "Lusaniya",
+    options: {
+      sizes: [
+        { name: "Small", price: 70000, serves_people: "2-3 people" },
+        { name: "Medium", price: 120000, serves_people: "4-5 people" },
+        { name: "Large", price: 180000, serves_people: "6-8 people" },
+        { name: "Extra Large", price: 250000, serves_people: "9-12 people" }
+      ]
+    }
+  },
+];
+
 
   const categories = useMemo(() => ['All', ...new Set(menuItems.map(item => item.category))], [menuItems]);
 
