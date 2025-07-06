@@ -595,7 +595,7 @@ const menuItems = [
 
         {/* Hero Section */}
         <section id="home" className="relative h-screen">
-          <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/50 z-10"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/60 z-10"></div>
           {/* Add descriptive alt text to images for SEO and accessibility */}
           <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('/mummy.webp')" }} role="img" aria-label="Delicious Ugandan food spread on a table at Marynan Bites Restaurant"></div>
 
